@@ -1,0 +1,7 @@
+server:
+  port: 8050
+rpc:
+  port: 8300
+  serverPackage: com.zhouj.rpc.server
+  zookeeper:
+    address: 127.0.0.1:2181
