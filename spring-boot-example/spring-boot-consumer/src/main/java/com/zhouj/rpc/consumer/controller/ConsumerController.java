@@ -27,9 +27,9 @@ public class ConsumerController {
     @RequestMapping("/remote")
     public String test() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(remoteService.remote());
-        stringBuilder.append(catService.cat());
-        stringBuilder.append(dogService.dog());
+        stringBuilder.append(remoteService.remote()+"\n");
+        stringBuilder.append(catService.cat()+"\n");
+        stringBuilder.append(dogService.dog()+"\n");
         return stringBuilder.toString();
     }
 }

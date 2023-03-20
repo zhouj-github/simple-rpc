@@ -40,6 +40,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
         Class c = serviceInfo.getServiceClass();
         Object result = methodInvoker.invoke(request, c);
         Response response = new Response();
+        response.setCode(200);
         response.setRequestId(request.getRequestId());
         response.setResult(result);
         response.setTimestamp(request.getTimestamp());

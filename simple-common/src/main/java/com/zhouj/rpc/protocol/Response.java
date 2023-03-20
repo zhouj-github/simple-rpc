@@ -9,6 +9,11 @@ public class Response {
 
     private String requestId;
 
+    /**
+     * 响应编码 200 成功 300超时
+     */
+    private int code;
+
     private String error;
 
     private Object result;
@@ -45,5 +50,13 @@ public class Response {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
     }
 }

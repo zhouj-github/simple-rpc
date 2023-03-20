@@ -91,12 +91,12 @@ public class ConnectManager {
      * @return
      * @throws Exception
      */
-    public ClientHandler getRoundRobinHandle(String serviceName) throws Exception {
+    public ClientHandler getRoundRobinHandle(String serviceName) {
         List<ClientHandler> handlers = handlerMap.get(serviceName);
         if (CollectionUtils.isEmpty(handlers)) {
             reWatch(serviceName);
             if (CollectionUtils.isEmpty(handlers)) {
-                throw new Exception("没有服务");
+                throw new RuntimeException("没有服务");
             }
         }
         int size = handlers.size();

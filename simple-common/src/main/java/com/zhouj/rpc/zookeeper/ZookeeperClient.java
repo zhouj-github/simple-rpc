@@ -45,7 +45,7 @@ public class ZookeeperClient {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         ZooKeeper zooKeeper = null;
         try {
-            zooKeeper = new ZooKeeper(address, 2000, new Watcher() {
+            zooKeeper = new ZooKeeper(address, 5000, new Watcher() {
                 @Override
                 public void process(WatchedEvent watchedEvent) {
                     if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {

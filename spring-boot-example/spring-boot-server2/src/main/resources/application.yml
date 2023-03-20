@@ -1,7 +1,7 @@
 server:
   port: 8050
 rpc:
-  port: 8300
-  serverPackage: com.zhouj.rpc.server
+  port: 8300 #服务端端口
+  serverPackage: com.zhouj.rpc.server #服务包路径扫描
   zookeeper:
-    address: 127.0.0.1:2181
+    address: 127.0.0.1:2181  #zookeeper地址

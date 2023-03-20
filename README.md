@@ -2,13 +2,11 @@
 
 基于netty+zookeeper+jprotobuf实现的简单springboot rpc框架<br>
 Features:
-* Reactor模型
 * 服务自动注册与发现
 * 服务节点优雅下线
 * 客户端负载均衡
-* 支持protostuff协议
+* protostuff协议
 * 请求超时重试
-* 异步获取响应结果
 
 ## 使用示例
 
@@ -29,6 +27,14 @@ public interface RemoteService{
 ````
 
 客户端示例
+```yaml
+rpc:
+  port: 8200 #服务端口配置
+  clientPackage: com.zhouj.rpc.consumer #客户端包扫描路径
+  zookeeper:
+    address: 127.0.0.1:2181 #zookeeper地址
+```
+
 ```java
 @RestController
 public class ConsumerController {
@@ -45,6 +51,13 @@ public class ConsumerController {
 }
 ```
 服务端示例
+```yaml
+rpc:
+  port: 8300 #服务端端口
+  serverPackage: com.zhouj.rpc.server #服务包路径扫描
+  zookeeper:
+    address: 127.0.0.1:2181  #zookeeper地址
+```
 ```java
 
 @RpcClient

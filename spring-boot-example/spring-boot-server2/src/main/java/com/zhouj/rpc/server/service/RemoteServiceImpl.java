@@ -15,6 +15,11 @@ public class RemoteServiceImpl implements RemoteService {
 
 
     public String remote() {
+        try {
+            Thread.sleep(3000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return "远程服务2";
     }
 }
