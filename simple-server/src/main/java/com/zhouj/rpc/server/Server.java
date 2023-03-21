@@ -2,8 +2,8 @@ package com.zhouj.rpc.server;
 
 import com.zhouj.rpc.config.RpcConfig;
 import com.zhouj.rpc.protocol.Request;
-import com.zhouj.rpc.protocol.RpcDecode;
-import com.zhouj.rpc.protocol.RpcEncode;
+import com.zhouj.rpc.protocol.Decode;
+import com.zhouj.rpc.protocol.Encode;
 import com.zhouj.rpc.registry.ServerRegister;
 import com.zhouj.rpc.registry.ServiceRegistry;
 import com.zhouj.rpc.util.IpUtils;
@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
  * @author zhouj
  * @since 2020-08-04
  */
-public class RpcServer {
+public class Server {
 
-    private Logger log = LoggerFactory.getLogger(RpcServer.class);
+    private Logger log = LoggerFactory.getLogger(Server.class);
 
     private ServerRegister serverRegister;
 
@@ -42,7 +42,7 @@ public class RpcServer {
     private ZookeeperClient zookeeperClient;
 
 
-    public RpcServer(ServerRegister serverRegister, ServiceRegistry serviceRegistry, RpcConfig rpcConfig) {
+    public Server(ServerRegister serverRegister, ServiceRegistry serviceRegistry, RpcConfig rpcConfig) {
         this.serverRegister = serverRegister;
         this.serviceRegistry = serviceRegistry;
         this.rpcConfig = rpcConfig;
@@ -62,8 +62,8 @@ public class RpcServer {
         serverBootStrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
-                socketChannel.pipeline().addLast(new RpcEncode());
-                socketChannel.pipeline().addLast(new RpcDecode(Request.class));
+                socketChannel.pipeline().addLast(new Encode());
+                socketChannel.pipeline().addLast(new Decode(Request.class));
                 socketChannel.pipeline().addLast(new ServerHandler(serviceRegistry));
             }
         });

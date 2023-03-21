@@ -6,29 +6,27 @@ import com.zhouj.rpc.protocol.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 /**
  * @author zhouj
  * @since 2020-08-04
  */
-public class RpcFuture implements Future<Response> {
+public class ResponseFuture implements Future<Response> {
 
-    Logger log = LoggerFactory.getLogger(RpcFuture.class);
+    Logger log = LoggerFactory.getLogger(ResponseFuture.class);
 
     private Request request;
 
     private Response response;
 
-    private FutureSync sync;
+    private FutureSync futureSync;
 
-    public RpcFuture(Request request) {
+    public ResponseFuture(Request request) {
         this.request = request;
-        this.sync = new FutureSync();
+        this.futureSync = new FutureSync();
     }
 
     @Override
@@ -43,18 +41,18 @@ public class RpcFuture implements Future<Response> {
 
     @Override
     public boolean isDone() {
-        return sync.isDone();
+        return futureSync.isDone();
     }
 
     @Override
     public Response get() {
-        sync.acquire(0);
+        futureSync.acquire(0);
         return response;
     }
 
     @Override
     public Response get(long timeout, TimeUnit unit) throws InterruptedException {
-        if (!sync.tryAcquireNanos(-1, unit.toNanos(timeout))) {
+        if (!futureSync.tryAcquireNanos(-1, unit.toNanos(timeout))) {
             log.info("请求超时返回============");
             response = new Response();
             response.setCode(Constant.TIME_OUT);
@@ -66,7 +64,7 @@ public class RpcFuture implements Future<Response> {
 
     public void done(Response response) {
         this.response = response;
-        sync.release(1);
+        futureSync.release(1);
     }
 
     public static class FutureSync extends AbstractQueuedSynchronizer {

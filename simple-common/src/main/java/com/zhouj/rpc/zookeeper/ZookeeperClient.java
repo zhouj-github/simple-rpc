@@ -1,5 +1,7 @@
 package com.zhouj.rpc.zookeeper;
 
+import com.zhouj.rpc.config.RpcConfig;
+import com.zhouj.rpc.constant.Constant;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
@@ -22,10 +24,13 @@ public class ZookeeperClient {
 
     private ZooKeeper zooKeeper;
 
+    private RpcConfig rpcConfig;
+
     private static ZookeeperClient zookeeperClient;
 
-    public ZookeeperClient(String address) {
-        this.address = address;
+    public ZookeeperClient(RpcConfig rpcConfig) {
+        this.rpcConfig = rpcConfig;
+        this.address = rpcConfig.getZookeeperAddress();
         init();
         zookeeperClient = this;
     }
@@ -49,12 +54,9 @@ public class ZookeeperClient {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         ZooKeeper zooKeeper = null;
         try {
-            zooKeeper = new ZooKeeper(address, 5000, new Watcher() {
-                @Override
-                public void process(WatchedEvent watchedEvent) {
-                    if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {
-                        countDownLatch.countDown();
-                    }
+            zooKeeper = new ZooKeeper(address, rpcConfig.getZookeeperSessionTimeOut() == 0 ? Constant.SESSION_TIMEOUT : rpcConfig.getZookeeperSessionTimeOut(), watchedEvent -> {
+                if (watchedEvent.getState() == Watcher.Event.KeeperState.SyncConnected) {
+                    countDownLatch.countDown();
                 }
             });
             countDownLatch.await();
@@ -99,6 +101,7 @@ public class ZookeeperClient {
 
     /**
      * 判断节点是否存在
+     *
      * @param path
      * @return
      */
@@ -118,6 +121,7 @@ public class ZookeeperClient {
 
     /**
      * 获取子节点数据
+     *
      * @param path
      * @param watcher
      * @return
@@ -133,6 +137,7 @@ public class ZookeeperClient {
 
     /**
      * 获取数据
+     *
      * @param path
      * @return
      */

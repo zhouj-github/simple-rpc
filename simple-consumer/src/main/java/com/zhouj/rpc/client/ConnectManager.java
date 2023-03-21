@@ -1,9 +1,10 @@
 package com.zhouj.rpc.client;
 
 import com.zhouj.rpc.client.discover.ServiceDiscover;
+import com.zhouj.rpc.constant.Constant;
 import com.zhouj.rpc.protocol.Response;
-import com.zhouj.rpc.protocol.RpcDecode;
-import com.zhouj.rpc.protocol.RpcEncode;
+import com.zhouj.rpc.protocol.Decode;
+import com.zhouj.rpc.protocol.Encode;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -71,13 +72,13 @@ public class ConnectManager {
     private void initBootstrap() {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(new NioEventLoopGroup(1)).channel(NioSocketChannel.class)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Constant.CONNECT_TIMEOUT)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel socketChannel) throws Exception {
+                    protected void initChannel(SocketChannel socketChannel) {
                         ChannelPipeline channelPipeline = socketChannel.pipeline();
-                        channelPipeline.addLast(new RpcEncode());
-                        channelPipeline.addLast(new RpcDecode(Response.class));
+                        channelPipeline.addLast(new Encode());
+                        channelPipeline.addLast(new Decode(Response.class));
                         channelPipeline.addLast(new ClientHandler());
                     }
                 });

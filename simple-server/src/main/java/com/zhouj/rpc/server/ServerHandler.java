@@ -26,7 +26,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
 
     private MethodInvoker methodInvoker;
 
-
     private ServiceRegistry serviceRegistry;
 
     public ServerHandler(ServiceRegistry serviceRegistry) {

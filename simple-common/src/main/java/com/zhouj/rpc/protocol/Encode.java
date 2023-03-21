@@ -1,6 +1,6 @@
 package com.zhouj.rpc.protocol;
 
-import com.zhouj.rpc.serializetion.ProtostuffUtil;
+import com.zhouj.rpc.util.ProtostuffUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -9,7 +9,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * @author zhouj
  * @since 2020-08-04
  */
-public class RpcEncode extends MessageToByteEncoder {
+public class Encode extends MessageToByteEncoder {
 
 
     @Override

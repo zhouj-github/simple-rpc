@@ -8,6 +8,13 @@ public class RpcConfig {
 
     private String zookeeperAddress;
 
+    private int zookeeperSessionTimeOut;
+
+    /**
+     * netty连接超时时间
+     */
+    private int connectTimeOut;
+
     private String port;
 
     private String clientPackage;
@@ -64,5 +71,21 @@ public class RpcConfig {
 
     public void setRetries(int retries) {
         this.retries = retries;
+    }
+
+    public int getZookeeperSessionTimeOut() {
+        return zookeeperSessionTimeOut;
+    }
+
+    public void setZookeeperSessionTimeOut(int zookeeperSessionTimeOut) {
+        this.zookeeperSessionTimeOut = zookeeperSessionTimeOut;
+    }
+
+    public int getConnectTimeOut() {
+        return connectTimeOut;
+    }
+
+    public void setConnectTimeOut(int connectTimeOut) {
+        this.connectTimeOut = connectTimeOut;
     }
 }

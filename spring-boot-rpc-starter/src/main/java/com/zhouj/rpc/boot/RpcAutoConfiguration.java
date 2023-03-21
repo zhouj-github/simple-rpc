@@ -12,7 +12,7 @@ import com.zhouj.rpc.constant.Constant;
 import com.zhouj.rpc.registry.DefaultServiceRegistry;
 import com.zhouj.rpc.registry.ServerRegister;
 import com.zhouj.rpc.registry.ServiceRegistry;
-import com.zhouj.rpc.server.RpcServer;
+import com.zhouj.rpc.server.Server;
 import com.zhouj.rpc.zookeeper.ZookeeperClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.EnvironmentAware;
@@ -44,7 +44,7 @@ public class RpcAutoConfiguration implements EnvironmentAware {
 
     @Bean
     public ZookeeperClient zookeeperClient(RpcConfig rpcConfig) {
-        return new ZookeeperClient(rpcConfig.getZookeeperAddress());
+        return new ZookeeperClient(rpcConfig);
     }
 
     @Bean
@@ -89,15 +89,15 @@ public class RpcAutoConfiguration implements EnvironmentAware {
 
     @Bean
     @ConditionalOnMissingBean
-    public RpcServer rpcServer(RpcConfig rpcConfig, ServiceRegistry serviceRegistry, ServerRegister serverRegister) {
+    public Server rpcServer(RpcConfig rpcConfig, ServiceRegistry serviceRegistry, ServerRegister serverRegister) {
         rpcConfig.setPort(rpcConfig.getPort());
-        RpcServer rpcServer = new RpcServer(serverRegister, serviceRegistry, rpcConfig);
+        Server rpcServer = new Server(serverRegister, serviceRegistry, rpcConfig);
         return rpcServer;
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public RpcServerLifeCycle rpcServerLifeCycle(RpcServer rpcServer) {
+    public RpcServerLifeCycle rpcServerLifeCycle(Server rpcServer) {
         RpcServerLifeCycle rpcServerLifeCycle = new RpcServerLifeCycle(rpcServer);
         return rpcServerLifeCycle;
     }

@@ -23,7 +23,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Response> {
 
     private Channel channel;
 
-    private Map<String, RpcFuture> map = new ConcurrentHashMap<>();
+    private Map<String, ResponseFuture> map = new ConcurrentHashMap<>();
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
@@ -44,7 +44,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Response> {
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Response response) throws Exception {
         //响应结果写回rpcFuture
         String requestId = response.getRequestId();
-        RpcFuture rpcFuture = map.get(requestId);
+        ResponseFuture rpcFuture = map.get(requestId);
         log.info("耗时:{}ms", System.currentTimeMillis() - response.getTimestamp());
         if (rpcFuture != null) {
             map.remove(requestId);
@@ -57,8 +57,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<Response> {
      * @param request
      * @return
      */
-    public RpcFuture sendRequest(Request request) {
-        RpcFuture rpcFuture = new RpcFuture(request);
+    public ResponseFuture sendRequest(Request request) {
+        ResponseFuture rpcFuture = new ResponseFuture(request);
         map.put(request.getRequestId(), rpcFuture);
         channel.writeAndFlush(request);
         return rpcFuture;

@@ -1,4 +1,4 @@
-package com.zhouj.rpc.serializetion;
+package com.zhouj.rpc.util;
 
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
@@ -18,7 +18,7 @@ public class ProtostuffUtil {
 
     private static Map<Class<?>, Schema<?>> cachedSchema = new ConcurrentHashMap<>();
 
-    private static Objenesis objenesis = new ObjenesisStd(true);
+    public static Objenesis objenesis = new ObjenesisStd(true);
 
     private ProtostuffUtil() {
     }

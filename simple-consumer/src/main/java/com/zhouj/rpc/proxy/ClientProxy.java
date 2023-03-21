@@ -2,7 +2,7 @@ package com.zhouj.rpc.proxy;
 
 import com.zhouj.rpc.client.ClientHandler;
 import com.zhouj.rpc.client.ConnectManager;
-import com.zhouj.rpc.client.RpcFuture;
+import com.zhouj.rpc.client.ResponseFuture;
 import com.zhouj.rpc.constant.Constant;
 import com.zhouj.rpc.protocol.Request;
 import com.zhouj.rpc.protocol.Response;
@@ -21,13 +21,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author zhouj
  * @since 2020-08-03
  */
-public class ProxyObject implements InvocationHandler {
+public class ClientProxy implements InvocationHandler {
 
-    Logger log = LoggerFactory.getLogger(ProxyObject.class);
+    Logger log = LoggerFactory.getLogger(ClientProxy.class);
 
     private Class<?> type;
 
-    public ProxyObject(Class type) {
+    public ClientProxy(Class type) {
         this.type = type;
     }
 
@@ -47,6 +47,7 @@ public class ProxyObject implements InvocationHandler {
         do {
             response = request(request, atomicInteger);
         } while (response != null && response.getCode() == Constant.TIME_OUT && atomicInteger.get() < i);
+
         if (response == null) {
             return null;
         } else {
@@ -58,7 +59,7 @@ public class ProxyObject implements InvocationHandler {
         try {
             ConnectManager connectManager = ConnectManager.getInstance();
             ClientHandler clientHandler = connectManager.getRoundRobinHandle(type.getName());
-            RpcFuture rpcFuture = clientHandler.sendRequest(request);
+            ResponseFuture rpcFuture = clientHandler.sendRequest(request);
             return rpcFuture.get(2, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);

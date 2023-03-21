@@ -14,7 +14,7 @@ public class ProxyFactory implements FactoryBean<Object> {
 
     @Override
     public Object getObject() {
-        return Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, new ProxyObject(type));
+        return Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, new ClientProxy(type));
     }
 
     @Override

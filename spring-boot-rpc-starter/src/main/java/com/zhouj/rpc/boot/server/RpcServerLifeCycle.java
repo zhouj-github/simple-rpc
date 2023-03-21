@@ -1,6 +1,6 @@
 package com.zhouj.rpc.boot.server;
 
-import com.zhouj.rpc.server.RpcServer;
+import com.zhouj.rpc.server.Server;
 import org.springframework.context.SmartLifecycle;
 
 /**
@@ -13,9 +13,9 @@ public class RpcServerLifeCycle implements SmartLifecycle {
 
     private volatile boolean running;
 
-    private RpcServer rpcServer;
+    private Server rpcServer;
 
-    public RpcServerLifeCycle(RpcServer rpcServer) {
+    public RpcServerLifeCycle(Server rpcServer) {
         this.rpcServer = rpcServer;
     }
 
