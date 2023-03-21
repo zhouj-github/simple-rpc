@@ -11,10 +11,9 @@ import io.netty.handler.codec.MessageToByteEncoder;
  */
 public class RpcEncode extends MessageToByteEncoder {
 
-    private Class<?> generateClass;
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
+    protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) {
         byte[] bytes = ProtostuffUtil.serialize(o);
         byteBuf.writeBytes(bytes);
     }

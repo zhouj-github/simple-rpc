@@ -1,7 +1,6 @@
 package com.zhouj.rpc.registry;
 
 
-import java.util.List;
 import java.util.Map;
 
 /**

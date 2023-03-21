@@ -4,6 +4,8 @@ import com.zhouj.rpc.boot.annotation.RpcService;
 import com.zhouj.rpc.registry.DefaultServiceInfo;
 import com.zhouj.rpc.registry.ServiceInfo;
 import com.zhouj.rpc.registry.ServiceRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -29,6 +31,8 @@ import java.util.Set;
  * @since 2020-08-04
  */
 public class ServerBeanDefinitionRegistry implements BeanDefinitionRegistryPostProcessor, EnvironmentAware {
+
+    private Logger logger = LoggerFactory.getLogger(ServerBeanDefinitionRegistry.class);
 
     private ServiceRegistry serviceRegistry;
 
@@ -67,7 +71,7 @@ public class ServerBeanDefinitionRegistry implements BeanDefinitionRegistryPostP
                     try {
                         serviceInfo.createService(Class.forName(beanDefinition.getBeanClassName()));
                     } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
+                        logger.error(e.getMessage(), e);
                     }
                     serviceInfoMap.put(serviceInfo.getInterfaceName(), serviceInfo);
                 }

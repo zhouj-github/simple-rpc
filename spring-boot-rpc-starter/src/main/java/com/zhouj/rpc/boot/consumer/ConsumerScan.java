@@ -6,6 +6,8 @@ import com.zhouj.rpc.client.registry.DefaultConsumer;
 import com.zhouj.rpc.config.RpcConfig;
 import com.zhouj.rpc.constant.Constant;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
  */
 public class ConsumerScan {
 
+    private Logger logger = LoggerFactory.getLogger(ConsumerScan.class);
+
     private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
     private MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory();
@@ -41,6 +45,7 @@ public class ConsumerScan {
 
     /**
      * 扫描客户端@RpcClient
+     *
      * @return
      */
     public List<Consumer> scanClient() {
@@ -70,10 +75,8 @@ public class ConsumerScan {
                     }
                 }
             }
-        } catch (IOException e) {
-            throw new RuntimeException("I/O failure during classpath scanning", e);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error(e.getMessage(), e);
         }
         return consumerMap.values().stream().collect(Collectors.toList());
 

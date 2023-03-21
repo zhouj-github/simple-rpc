@@ -14,6 +14,10 @@ public class RpcConfig {
 
     private String serverPackage;
 
+    private int requestTimeOut;
+
+    private int retries;
+
     public String getZookeeperAddress() {
         return zookeeperAddress;
     }
@@ -44,5 +48,21 @@ public class RpcConfig {
 
     public void setServerPackage(String serverPackage) {
         this.serverPackage = serverPackage;
+    }
+
+    public int getRequestTimeOut() {
+        return requestTimeOut;
+    }
+
+    public void setRequestTimeOut(int requestTimeOut) {
+        this.requestTimeOut = requestTimeOut;
+    }
+
+    public int getRetries() {
+        return retries;
+    }
+
+    public void setRetries(int retries) {
+        this.retries = retries;
     }
 }

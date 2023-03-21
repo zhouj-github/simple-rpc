@@ -20,7 +20,7 @@ public class RpcDecode extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
+    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
         int length = byteBuf.readableBytes();
         byte[] bytes = new byte[length];
         byteBuf.readBytes(bytes);

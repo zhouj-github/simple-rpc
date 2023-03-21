@@ -27,7 +27,6 @@ public class IpUtils {
                     .hasMoreElements(); ) {
                 NetworkInterface ifc = nics.nextElement();
                 if (ifc.isUp()) {
-                    log.trace("Testing interface: " + ifc.getDisplayName());
                     if (ifc.getIndex() < lowest || result == null) {
                         lowest = ifc.getIndex();
                     } else if (result != null) {
@@ -39,16 +38,13 @@ public class IpUtils {
                         InetAddress address = addrs.nextElement();
                         if (address instanceof Inet4Address
                                 && !address.isLoopbackAddress()) {
-                            log.trace("Found non-loopback interface: "
-                                    + ifc.getDisplayName());
                             result = address;
                         }
                     }
-                    // @formatter:on
                 }
             }
         } catch (IOException ex) {
-            log.error("Cannot get first non-loopback address", ex);
+            log.error("没有外网地址", ex);
         }
 
         if (result != null) {
@@ -58,7 +54,7 @@ public class IpUtils {
         try {
             return InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
-            log.warn("Unable to retrieve localhost");
+            log.warn("未找到本地地址");
         }
 
         return null;
@@ -68,7 +64,6 @@ public class IpUtils {
     public static void main(String[] args) {
         InetAddress inetAddress = findFirstNonLoopbackAddress();
         System.out.println(inetAddress.getHostAddress());
-
     }
 
 }

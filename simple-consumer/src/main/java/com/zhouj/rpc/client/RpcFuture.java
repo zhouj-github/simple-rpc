@@ -1,5 +1,6 @@
 package com.zhouj.rpc.client;
 
+import com.zhouj.rpc.constant.Constant;
 import com.zhouj.rpc.protocol.Request;
 import com.zhouj.rpc.protocol.Response;
 import org.slf4j.Logger;
@@ -46,17 +47,17 @@ public class RpcFuture implements Future<Response> {
     }
 
     @Override
-    public Response get() throws InterruptedException, ExecutionException {
+    public Response get() {
         sync.acquire(0);
         return response;
     }
 
     @Override
-    public Response get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public Response get(long timeout, TimeUnit unit) throws InterruptedException {
         if (!sync.tryAcquireNanos(-1, unit.toNanos(timeout))) {
             log.info("请求超时返回============");
             response = new Response();
-            response.setCode(300);
+            response.setCode(Constant.TIME_OUT);
             return response;
         }
         return response;
@@ -69,8 +70,9 @@ public class RpcFuture implements Future<Response> {
     }
 
     public static class FutureSync extends AbstractQueuedSynchronizer {
-
-        //future status
+        /**
+         * 请求完成状态
+         */
         private final int done = 1;
 
         private final int pending = 0;

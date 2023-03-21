@@ -3,16 +3,15 @@ package com.zhouj.rpc.proxy;
 import com.zhouj.rpc.client.ClientHandler;
 import com.zhouj.rpc.client.ConnectManager;
 import com.zhouj.rpc.client.RpcFuture;
+import com.zhouj.rpc.constant.Constant;
 import com.zhouj.rpc.protocol.Request;
 import com.zhouj.rpc.protocol.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -44,9 +43,10 @@ public class ProxyObject implements InvocationHandler {
         AtomicInteger atomicInteger = new AtomicInteger(0);
         Response response;
         //超时重试,重试时重新获取连接
+        int i = 2;
         do {
-            response = request(request);
-        } while (response != null && response.getCode() == 300 && atomicInteger.get() < 2);
+            response = request(request, atomicInteger);
+        } while (response != null && response.getCode() == Constant.TIME_OUT && atomicInteger.get() < i);
         if (response == null) {
             return null;
         } else {
@@ -54,18 +54,16 @@ public class ProxyObject implements InvocationHandler {
         }
     }
 
-    public Response request(Request request) {
+    public Response request(Request request, AtomicInteger atomicInteger) {
         try {
             ConnectManager connectManager = ConnectManager.getInstance();
             ClientHandler clientHandler = connectManager.getRoundRobinHandle(type.getName());
             RpcFuture rpcFuture = clientHandler.sendRequest(request);
             return rpcFuture.get(2, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
             log.error(e.getMessage(), e);
+        } finally {
+            atomicInteger.incrementAndGet();
         }
         return null;
 

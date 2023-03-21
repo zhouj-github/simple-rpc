@@ -7,6 +7,9 @@ package com.zhouj.rpc.protocol;
  */
 public class Response {
 
+    /**
+     * 请求id
+     */
     private String requestId;
 
     /**
@@ -14,10 +17,19 @@ public class Response {
      */
     private int code;
 
+    /**
+     * 错误
+     */
     private String error;
 
+    /**
+     * 返回数据
+     */
     private Object result;
 
+    /**
+     * 时间戳
+     */
     private Long timestamp;
 
     public String getRequestId() {

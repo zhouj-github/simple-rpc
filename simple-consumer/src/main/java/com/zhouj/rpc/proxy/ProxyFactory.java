@@ -13,7 +13,7 @@ public class ProxyFactory implements FactoryBean<Object> {
     public Class<?> type;
 
     @Override
-    public Object getObject() throws Exception {
+    public Object getObject() {
         return Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, new ProxyObject(type));
     }
 

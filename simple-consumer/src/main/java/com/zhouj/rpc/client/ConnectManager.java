@@ -152,7 +152,7 @@ public class ConnectManager {
                 try {
                     countDownLatch.await();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             });
 

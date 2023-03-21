@@ -1,6 +1,6 @@
 ## simple-rpc
 
-基于netty+zookeeper实现的简单springboot rpc框架<br>
+基于netty+zookeeper实现的springboot rpc框架<br>
 Features:
 * 服务自动注册与发现
 * 服务节点优雅下线

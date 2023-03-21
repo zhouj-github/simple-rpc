@@ -11,4 +11,8 @@ public interface Constant {
     String NODE = "/node";
 
     String BASE_PATH = "com.zhouj.rpc";
+
+    Integer TIME_OUT = 300;
+
+    Integer SUCCESS = 200;
 }

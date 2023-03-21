@@ -23,7 +23,6 @@ public class ProtostuffUtil {
     private ProtostuffUtil() {
     }
 
-    @SuppressWarnings("unchecked")
     private static <T> Schema<T> getSchema(Class<T> cls) {
         return (Schema<T>) cachedSchema.computeIfAbsent(cls, RuntimeSchema::createFrom);
     }
@@ -31,7 +30,6 @@ public class ProtostuffUtil {
     /**
      * 序列化（对象 -> 字节数组）
      */
-    @SuppressWarnings("unchecked")
     public static <T> byte[] serialize(T obj) {
         Class<T> cls = (Class<T>) obj.getClass();
         LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
