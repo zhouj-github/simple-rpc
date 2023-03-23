@@ -1,32 +1,24 @@
 package com.zhouj.rpc.proxy;
 
-import org.springframework.beans.factory.FactoryBean;
-
-import java.lang.reflect.Proxy;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * @author zhouj
- * @since 2020-08-03
+ * @since 2023-03-23
  */
-public class ProxyFactory implements FactoryBean<Object> {
+public class ProxyFactory {
 
-    public Class<?> type;
-
-    @Override
     public Object getObject() {
-        return Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, new ClientProxy(type));
+
+        return null;
     }
 
-    @Override
-    public Class<?> getObjectType() {
-        return type;
-    }
-
-    public Class<?> getType() {
-        return type;
-    }
-
-    public void setType(Class<?> type) {
-        this.type = type;
+    public static void main(String[] args) {
+        try {
+            JavassistProxy.newProxyInstance(ClassLoader.getSystemClassLoader(), DefaultListableBeanFactory.class, new ClientInvocationHandler(BeanDefinitionRegistry.class));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

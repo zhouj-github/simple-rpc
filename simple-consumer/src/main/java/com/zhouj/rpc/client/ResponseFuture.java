@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.AbstractQueuedSynchronizer;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author zhouj
@@ -20,13 +20,30 @@ public class ResponseFuture implements Future<Response> {
 
     private Request request;
 
-    private Response response;
+    private volatile Response response;
 
-    private FutureSync futureSync;
+    private Thread thread;
+
+    private volatile boolean done = false;
+
+    public void setDone(boolean done) {
+        this.done = done;
+    }
+
+    public void setResponse(Response response) {
+        this.response = response;
+    }
+
+    public void setThread(Thread thread) {
+        this.thread = thread;
+    }
+
+    public Thread getThread() {
+        return thread;
+    }
 
     public ResponseFuture(Request request) {
         this.request = request;
-        this.futureSync = new FutureSync();
     }
 
     @Override
@@ -41,18 +58,23 @@ public class ResponseFuture implements Future<Response> {
 
     @Override
     public boolean isDone() {
-        return futureSync.isDone();
+        return this.done;
     }
 
     @Override
     public Response get() {
-        futureSync.acquire(0);
+        if (!isDone()) {
+            LockSupport.park();
+        }
         return response;
     }
 
     @Override
-    public Response get(long timeout, TimeUnit unit) throws InterruptedException {
-        if (!futureSync.tryAcquireNanos(-1, unit.toNanos(timeout))) {
+    public Response get(long timeout, TimeUnit unit) {
+        if (!isDone()) {
+            LockSupport.parkNanos(unit.toNanos(timeout));
+        }
+        if (!isDone()) {
             log.info("请求超时返回============");
             response = new Response();
             response.setCode(Constant.TIME_OUT);
@@ -62,41 +84,4 @@ public class ResponseFuture implements Future<Response> {
     }
 
 
-    public void done(Response response) {
-        this.response = response;
-        futureSync.release(1);
-    }
-
-    public static class FutureSync extends AbstractQueuedSynchronizer {
-        /**
-         * 请求完成状态
-         */
-        private final int done = 1;
-
-        private final int pending = 0;
-
-        @Override
-        protected boolean tryAcquire(int arg) {
-            return getState() == done;
-        }
-
-        @Override
-        protected boolean tryRelease(int arg) {
-            if (getState() == pending) {
-                if (compareAndSetState(pending, done)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return true;
-            }
-        }
-
-        protected boolean isDone() {
-            return getState() == done;
-        }
-
-
-    }
 }

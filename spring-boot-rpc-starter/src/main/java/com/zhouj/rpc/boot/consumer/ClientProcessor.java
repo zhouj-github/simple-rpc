@@ -2,9 +2,8 @@ package com.zhouj.rpc.boot.consumer;
 
 import com.zhouj.rpc.client.registry.Consumer;
 import com.zhouj.rpc.client.registry.ConsumerRegistry;
-import com.zhouj.rpc.proxy.ProxyFactory;
+import com.zhouj.rpc.proxy.ClientFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -35,13 +34,13 @@ public class ClientProcessor implements BeanDefinitionRegistryPostProcessor {
 
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException {
-        List<Consumer> consumers = consumerRegistry.getConsumers();
+        List<Consumer> consumers = consumerRegistry.getConsumerCache();
         if (CollectionUtils.isEmpty(consumers)) {
             return;
         }
         for (Consumer consumer : consumers) {
             consumerRegistry.registry(consumer);
-            BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(ProxyFactory.class);
+            BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(ClientFactory.class);
             beanDefinitionBuilder.addPropertyValue("type", consumer.getConsumerClass());
             beanDefinitionBuilder.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
             beanDefinitionBuilder.setPrimary(true);

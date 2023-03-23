@@ -10,6 +10,7 @@ import com.zhouj.rpc.server.api.RemoteService;
 @RpcService
 public class RemoteServiceImpl implements RemoteService {
 
+    @Override
     public String remote() {
         return "远程服务2";
     }

@@ -35,6 +35,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Request request) {
+        log.info("===================>接收到rpc请求");
         String interfaceName = request.getInterfaceName();
         ServiceInfo serviceInfo = serviceRegistry.getService(interfaceName);
         Class c = serviceInfo.getServiceClass();

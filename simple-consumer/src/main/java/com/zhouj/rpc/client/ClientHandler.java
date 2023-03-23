@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * 消费者处理handler
@@ -23,7 +24,10 @@ public class ClientHandler extends SimpleChannelInboundHandler<Response> {
 
     private Channel channel;
 
-    private Map<String, ResponseFuture> map = new ConcurrentHashMap<>();
+    /**
+     *
+     */
+    private Map<String, ResponseFuture> requestCache = new ConcurrentHashMap<>();
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
@@ -42,14 +46,14 @@ public class ClientHandler extends SimpleChannelInboundHandler<Response> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Response response) throws Exception {
+        log.info("===================>接收到rpc响应");
         //响应结果写回rpcFuture
         String requestId = response.getRequestId();
-        ResponseFuture rpcFuture = map.get(requestId);
+        ResponseFuture rpcFuture = requestCache.get(requestId);
+        rpcFuture.setDone(true);
+        rpcFuture.setResponse(response);
+        LockSupport.unpark(rpcFuture.getThread());
         log.info("耗时:{}ms", System.currentTimeMillis() - response.getTimestamp());
-        if (rpcFuture != null) {
-            map.remove(requestId);
-            rpcFuture.done(response);
-        }
     }
 
     /***
@@ -59,7 +63,8 @@ public class ClientHandler extends SimpleChannelInboundHandler<Response> {
      */
     public ResponseFuture sendRequest(Request request) {
         ResponseFuture rpcFuture = new ResponseFuture(request);
-        map.put(request.getRequestId(), rpcFuture);
+        rpcFuture.setThread(Thread.currentThread());
+        requestCache.put(request.getRequestId(), rpcFuture);
         channel.writeAndFlush(request);
         return rpcFuture;
     }

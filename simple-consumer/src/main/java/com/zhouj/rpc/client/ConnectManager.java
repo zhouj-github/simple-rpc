@@ -54,6 +54,10 @@ public class ConnectManager {
         initBootstrap();
     }
 
+    /**
+     * 获取ConnectManager实例
+     * @return
+     */
     public static ConnectManager getInstance() {
         if (connectManager == null) {
             synchronized (ConnectManager.class) {
@@ -92,7 +96,7 @@ public class ConnectManager {
      * @return
      * @throws Exception
      */
-    public ClientHandler getRoundRobinHandle(String serviceName) {
+    public ClientHandler roundHandle(String serviceName) {
         List<ClientHandler> handlers = handlerMap.get(serviceName);
         if (CollectionUtils.isEmpty(handlers)) {
             reWatch(serviceName);
@@ -125,7 +129,7 @@ public class ConnectManager {
 
     }
 
-    public void updateServices(List<String> nodeList, String serviceName) {
+    public void updateHandlers(List<String> nodeList, String serviceName) {
         if (!CollectionUtils.isEmpty(nodeList)) {
             nodeList.stream().forEach(node -> {
                 if (!checkNode(serviceName, node)) {

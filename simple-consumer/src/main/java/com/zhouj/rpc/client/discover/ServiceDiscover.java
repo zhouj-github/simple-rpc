@@ -50,10 +50,10 @@ public class ServiceDiscover {
      */
     private void initNodes() {
         addRootNode();
-        if (CollectionUtils.isEmpty(consumerRegistry.getConsumers())) {
+        if (CollectionUtils.isEmpty(consumerRegistry.getConsumerCache())) {
             return;
         }
-        consumerRegistry.getConsumers().forEach(consumer -> {
+        consumerRegistry.getConsumerCache().forEach(consumer -> {
             String path = path(consumer.getServiceName());
             if (!zookeeperClient.exist(path)) {
                 zookeeperClient.createPath(path);
@@ -87,7 +87,7 @@ public class ServiceDiscover {
         }
         String[] strings = path.split("/");
         String serviceName = strings[strings.length - 1];
-        ConnectManager.getInstance().updateServices(nodeList, serviceName);
+        ConnectManager.getInstance().updateHandlers(nodeList, serviceName);
 
     }
 

@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface ConsumerRegistry {
 
-    List<Consumer> getConsumers();
+    List<Consumer> getConsumerCache();
 
     void registry(Class<?> aClass);
 

@@ -21,13 +21,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author zhouj
  * @since 2020-08-03
  */
-public class ClientProxy implements InvocationHandler {
+public class ClientInvocationHandler implements InvocationHandler {
 
-    Logger log = LoggerFactory.getLogger(ClientProxy.class);
+    Logger log = LoggerFactory.getLogger(ClientInvocationHandler.class);
 
     private Class<?> type;
 
-    public ClientProxy(Class type) {
+    public ClientInvocationHandler(Class type) {
         this.type = type;
     }
 
@@ -45,6 +45,9 @@ public class ClientProxy implements InvocationHandler {
         //超时重试,重试时重新获取连接
         int i = 2;
         do {
+            if (atomicInteger.get() > 0) {
+                log.info("重试次数:" + atomicInteger.get());
+            }
             response = request(request, atomicInteger);
         } while (response != null && response.getCode() == Constant.TIME_OUT && atomicInteger.get() < i);
 
@@ -58,16 +61,11 @@ public class ClientProxy implements InvocationHandler {
     public Response request(Request request, AtomicInteger atomicInteger) {
         try {
             ConnectManager connectManager = ConnectManager.getInstance();
-            ClientHandler clientHandler = connectManager.getRoundRobinHandle(type.getName());
+            ClientHandler clientHandler = connectManager.roundHandle(type.getName());
             ResponseFuture rpcFuture = clientHandler.sendRequest(request);
-            return rpcFuture.get(2, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
+            return rpcFuture.get(Constant.SESSION_TIMEOUT, TimeUnit.MILLISECONDS);
         } finally {
             atomicInteger.incrementAndGet();
         }
-        return null;
-
-
     }
 }

@@ -7,8 +7,10 @@ Features:
 * 客户端负载均衡
 * protostuff协议
 * 请求超时重试
+* 基于javassist实现动态代理
 
 ## 使用示例
+### 引入依赖
 
 ```xml
         <dependency>
@@ -18,7 +20,8 @@ Features:
         </dependency>
 
 ```
-定义接口
+### 定义接口
+
 ````java
 public interface RemoteService{
     
@@ -26,7 +29,9 @@ public interface RemoteService{
 }
 ````
 
-客户端示例
+### 客户端示例
+#### 客户端配置
+
 ```yaml
 rpc:
   port: 8200 #服务端口配置
@@ -34,7 +39,7 @@ rpc:
   zookeeper:
     address: 127.0.0.1:2181 #zookeeper地址
 ```
-
+#### 客户端使用示例
 ```java
 @RestController
 public class ConsumerController {
@@ -50,7 +55,9 @@ public class ConsumerController {
     }
 }
 ```
-服务端示例
+### 服务端示例
+#### 服务端配置文件
+
 ```yaml
 rpc:
   port: 8300 #服务端端口
@@ -58,8 +65,9 @@ rpc:
   zookeeper:
     address: 127.0.0.1:2181  #zookeeper地址
 ```
-```java
+#### 服务端service示例
 
+```java
 @RpcClient
 public class RemoteServiceImpl implements RemoteService {
      public String remote(){
