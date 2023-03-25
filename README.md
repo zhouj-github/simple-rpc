@@ -68,7 +68,7 @@ rpc:
 #### 服务端service示例
 
 ```java
-@RpcClient
+@RpcServer
 public class RemoteServiceImpl implements RemoteService {
      public String remote(){
          return "远程服务";
