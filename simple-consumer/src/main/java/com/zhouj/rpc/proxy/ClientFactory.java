@@ -17,7 +17,7 @@ public class ClientFactory implements FactoryBean<Object> {
     @Override
     public Object getObject() {
         try {
-            return JavassistProxy.newProxyInstance(type.getClassLoader(), type, new ClientInvocationHandler(type));
+            return ProxyFactory.getProxy(type.getClassLoader(), type, new ClientInvocationHandler(type));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

@@ -1,22 +1,30 @@
 package com.zhouj.rpc.proxy;
 
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import com.zhouj.rpc.client.registry.Consumer;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
+import java.lang.reflect.InvocationHandler;
+
 /**
+ * 代理工厂类
+ *
  * @author zhouj
  * @since 2023-03-23
  */
 public class ProxyFactory {
 
-    public Object getObject() {
+    public static Object getProxy(ClassLoader classLoader, Class<?> targetClass, InvocationHandler handler) {
 
-        return null;
+        try {
+            return JavassistProxy.newProxyInstance(classLoader, targetClass, handler);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public static void main(String[] args) {
         try {
-            JavassistProxy.newProxyInstance(ClassLoader.getSystemClassLoader(), DefaultListableBeanFactory.class, new ClientInvocationHandler(BeanDefinitionRegistry.class));
+            JavassistProxy.newProxyInstance(ClassLoader.getSystemClassLoader(), DefaultListableBeanFactory.class, new ClientInvocationHandler(Consumer.class));
         } catch (Exception e) {
             e.printStackTrace();
         }

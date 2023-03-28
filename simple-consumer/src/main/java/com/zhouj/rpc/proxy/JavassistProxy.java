@@ -29,6 +29,9 @@ public class JavassistProxy {
 
     private static ConcurrentHashMap<Class<?>, Object> proxyCache = new ConcurrentHashMap<>();
 
+    private static ClassPool pool = ClassPool.getDefault();
+
+
     /**
      * 创建动态代理类
      *
@@ -40,11 +43,9 @@ public class JavassistProxy {
      */
     public static Object newProxyInstance(ClassLoader classLoader, Class<?> targetClass, InvocationHandler handler) throws Exception {
 
-
         if (proxyCache.containsKey(targetClass)) {
             return proxyCache.get(targetClass);
         }
-        ClassPool pool = ClassPool.getDefault();
 
         //生成代理类的全限定名
         String proxyName = generateClassName(targetClass);
@@ -72,18 +73,26 @@ public class JavassistProxy {
 
         proxy.addConstructor(CtNewConstructor.defaultConstructor(proxy));
 
-        CtClass ctClass = pool.get(targetClass.getName());
-        proxy.addInterface(ctClass);
 
         if (targetClass.isInterface()) {
-            //基于接口生成代理类
-            proxyInterface(targetClass, methods, proxy);
+            CtClass ctClass = pool.get(targetClass.getName());
+            proxy.addInterface(ctClass);
+            //基于接口生成代理方法
+            proxyTargetClass(targetClass, methods, proxy);
         } else {
             //基于类生成代理类
+            CtClass targetCtClass = pool.get(targetClass.getName());
+            if (Modifier.isFinal(targetClass.getModifiers())) {
+                throw new RuntimeException("final类不能被代理");
+            }
+            proxy.setSuperclass(targetCtClass);
             List<Class<?>> classList = ClassUtils.getAllInterfaces(targetClass);
             for (Class<?> aClass : classList) {
-                proxyInterface(aClass, methods, proxy);
+                CtClass ctClass = pool.get(aClass.getName());
+                proxy.addInterface(ctClass);
             }
+            //根据类生成代理方法
+            proxyTargetClass(targetClass, methods, proxy);
         }
         Class<?> proxyClass = proxy.toClass(classLoader, null);
         proxyClass.getField("methods").set(null, methods);
@@ -100,14 +109,14 @@ public class JavassistProxy {
 
 
     /**
-     * 按接口生成方法
+     * 根据接口或类生成方法
      *
      * @param interfaceClass
      * @param methods
      * @param proxy
      * @throws Exception
      */
-    private static void proxyInterface(Class<?> interfaceClass, List<Method> methods, CtClass proxy) throws Exception {
+    private static void proxyTargetClass(Class<?> interfaceClass, List<Method> methods, CtClass proxy) throws Exception {
 
         Method[] declaredMethods = interfaceClass.getDeclaredMethods();
         for (Method method : declaredMethods) {
@@ -152,7 +161,11 @@ public class JavassistProxy {
      * @param proxy
      * @throws CannotCompileException
      */
-    private static void makeMethod(Method method, List<Method> methods, CtClass proxy) throws CannotCompileException {
+    private static void makeMethod(Method method, List<Method> methods, CtClass proxy) throws CannotCompileException, NotFoundException {
+        if (Modifier.isFinal(method.getModifiers())) {
+            log.info("跳过final方法:{}", method.getModifiers());
+            return;
+        }
         Class<?> returnType = method.getReturnType();
         Class<?>[] parameterTypes = method.getParameterTypes();
 
@@ -228,8 +241,14 @@ public class JavassistProxy {
         return c.getName();
     }
 
-    private static String returnType(Class<?> cl, String name) {
-        return "(" + getParameterType(cl) + ")" + name;
+    private static String returnType(Class<?> cl, String result) throws NotFoundException {
+        if (cl.isPrimitive()) {
+            CtClass ctClass = pool.getCtClass(cl.getName());
+            CtPrimitiveType ctPrimitiveType = (CtPrimitiveType) ctClass;
+            return "((" + ctPrimitiveType.getWrapperName() + ") " + result + ")." + ctPrimitiveType.getGetMethodName() + "()";
+        } else {
+            return "(" + getParameterType(cl) + ")" + result;
+        }
     }
 
     private static String generateClassName(Class<?> type) {
