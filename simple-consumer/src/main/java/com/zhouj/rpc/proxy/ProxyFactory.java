@@ -1,6 +1,7 @@
 package com.zhouj.rpc.proxy;
 
 import com.zhouj.rpc.client.registry.Consumer;
+import com.zhouj.rpc.config.RpcConfig;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 import java.lang.reflect.InvocationHandler;
@@ -24,7 +25,7 @@ public class ProxyFactory {
 
     public static void main(String[] args) {
         try {
-            JavassistProxy.newProxyInstance(ClassLoader.getSystemClassLoader(), DefaultListableBeanFactory.class, new ClientInvocationHandler(Consumer.class));
+            JavassistProxy.newProxyInstance(ClassLoader.getSystemClassLoader(), RpcConfig.class, new ClientInvocationHandler(Consumer.class));
         } catch (Exception e) {
             e.printStackTrace();
         }

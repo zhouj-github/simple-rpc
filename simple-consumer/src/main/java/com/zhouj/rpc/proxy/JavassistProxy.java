@@ -73,7 +73,6 @@ public class JavassistProxy {
 
         proxy.addConstructor(CtNewConstructor.defaultConstructor(proxy));
 
-
         if (targetClass.isInterface()) {
             CtClass ctClass = pool.get(targetClass.getName());
             proxy.addInterface(ctClass);
@@ -97,7 +96,7 @@ public class JavassistProxy {
         Class<?> proxyClass = proxy.toClass(classLoader, null);
         proxyClass.getField("methods").set(null, methods);
         //动态代理类写入类文件
-//        proxy.writeFile();
+        proxy.writeFile();
         Object instance = proxyClass.getConstructor(InvocationHandler.class).newInstance(handler);
 
         Object old = proxyCache.putIfAbsent(targetClass, instance);
@@ -209,6 +208,12 @@ public class JavassistProxy {
     }
 
 
+    /**
+     * 生成访问修饰符
+     *
+     * @param mod
+     * @return
+     */
     private static String modifier(int mod) {
         if (Modifier.isPublic(mod)) {
             return "public";
@@ -241,18 +246,38 @@ public class JavassistProxy {
         return c.getName();
     }
 
+    /**
+     * 返回类型处理
+     *
+     * @param cl
+     * @param result
+     * @return
+     * @throws NotFoundException
+     */
     private static String returnType(Class<?> cl, String result) throws NotFoundException {
         if (cl.isPrimitive()) {
+            //基础返回类型处理
             CtClass ctClass = pool.getCtClass(cl.getName());
             CtPrimitiveType ctPrimitiveType = (CtPrimitiveType) ctClass;
-            return "((" + ctPrimitiveType.getWrapperName() + ") " + result + ")." + ctPrimitiveType.getGetMethodName() + "()";
+            if (!Character.TYPE.equals(cl)) {
+                return result + "==null?" + ctPrimitiveType.getWrapperName() + ".valueOf(\"0\")." + ctPrimitiveType.getGetMethodName() + "():((" + ctPrimitiveType.getWrapperName() + ") " + result + ")." + ctPrimitiveType.getGetMethodName() + "()";
+            } else {
+                return result + "==null?" + ctPrimitiveType.getWrapperName() + ".valueOf(CHARACTER.valueOf('0'))." + ctPrimitiveType.getGetMethodName() + "():((" + ctPrimitiveType.getWrapperName() + ") " + result + ")." + ctPrimitiveType.getGetMethodName() + "()";
+            }
         } else {
             return "(" + getParameterType(cl) + ")" + result;
         }
     }
 
+    /**
+     * 生成代理类名
+     *
+     * @param type
+     * @return
+     */
     private static String generateClassName(Class<?> type) {
 
         return String.format("%s$Proxy%d", type.getName(), counter.getAndIncrement());
     }
+
 }
