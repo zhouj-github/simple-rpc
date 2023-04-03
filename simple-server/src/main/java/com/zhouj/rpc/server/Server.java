@@ -1,6 +1,7 @@
 package com.zhouj.rpc.server;
 
 import com.zhouj.rpc.config.RpcConfig;
+import com.zhouj.rpc.constant.Constant;
 import com.zhouj.rpc.protocol.Request;
 import com.zhouj.rpc.protocol.Decode;
 import com.zhouj.rpc.protocol.Encode;
@@ -9,6 +10,8 @@ import com.zhouj.rpc.registry.ServiceRegistry;
 import com.zhouj.rpc.util.IpUtils;
 import com.zhouj.rpc.zookeeper.ZookeeperClient;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -62,9 +65,11 @@ public class Server {
         this.workerGroup = new NioEventLoopGroup(1);
         serverBootStrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
-            protected void initChannel(SocketChannel socketChannel) throws Exception {
+            protected void initChannel(SocketChannel socketChannel) {
+                ByteBuf delimiter = Unpooled.buffer();
+                delimiter.writeBytes(Constant.SPLIT.getBytes());
                 socketChannel.pipeline().addLast(new Encode());
-                socketChannel.pipeline().addLast(new Decode(Request.class));
+                socketChannel.pipeline().addLast(new Decode(Constant.MAX_FRAME_LENGTH, delimiter, Request.class));
                 socketChannel.pipeline().addLast(new ServerHandler(serviceRegistry));
             }
         });

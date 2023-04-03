@@ -4,6 +4,7 @@ import com.zhouj.rpc.util.ProtostuffUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 
 import java.util.List;
 
@@ -11,20 +12,23 @@ import java.util.List;
  * @author zhouj
  * @since 2020-08-04
  */
-public class Decode extends ByteToMessageDecoder {
+public class Decode extends DelimiterBasedFrameDecoder {
 
-    private Class<?> generateClass;
-
-    public Decode(Class<?> generateClass) {
+    public Decode(int maxFrameLength, ByteBuf delimiter, Class<?> generateClass) {
+        super(maxFrameLength, delimiter);
         this.generateClass = generateClass;
     }
 
+    private Class<?> generateClass;
+
+
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
-        int length = byteBuf.readableBytes();
+    protected Object decode(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
+        ByteBuf buff = (ByteBuf) super.decode(ctx, buffer);
+        int length = buff.readableBytes();
         byte[] bytes = new byte[length];
-        byteBuf.readBytes(bytes);
-        Object o = ProtostuffUtil.deserialize(bytes,generateClass);
-        list.add(o);
+        buff.readBytes(bytes);
+        return ProtostuffUtil.deserialize(bytes, generateClass);
     }
+
 }

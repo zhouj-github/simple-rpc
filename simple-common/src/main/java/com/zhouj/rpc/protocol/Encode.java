@@ -1,5 +1,6 @@
 package com.zhouj.rpc.protocol;
 
+import com.zhouj.rpc.constant.Constant;
 import com.zhouj.rpc.util.ProtostuffUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,5 +17,7 @@ public class Encode extends MessageToByteEncoder {
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) {
         byte[] bytes = ProtostuffUtil.serialize(o);
         byteBuf.writeBytes(bytes);
+        //添加分割字符
+        byteBuf.writeBytes(Constant.SPLIT.getBytes());
     }
 }

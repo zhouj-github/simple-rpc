@@ -6,6 +6,8 @@ import com.zhouj.rpc.protocol.Response;
 import com.zhouj.rpc.protocol.Decode;
 import com.zhouj.rpc.protocol.Encode;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -56,6 +58,7 @@ public class ConnectManager {
 
     /**
      * 获取ConnectManager实例
+     *
      * @return
      */
     public static ConnectManager getInstance() {
@@ -80,9 +83,11 @@ public class ConnectManager {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) {
+                        ByteBuf delimiter = Unpooled.buffer();
+                        delimiter.writeBytes(Constant.SPLIT.getBytes());
                         ChannelPipeline channelPipeline = socketChannel.pipeline();
                         channelPipeline.addLast(new Encode());
-                        channelPipeline.addLast(new Decode(Response.class));
+                        channelPipeline.addLast(new Decode(Constant.MAX_FRAME_LENGTH, delimiter, Response.class));
                         channelPipeline.addLast(new ClientHandler());
                     }
                 });

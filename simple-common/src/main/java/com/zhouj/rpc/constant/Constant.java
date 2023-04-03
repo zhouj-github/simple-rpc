@@ -19,4 +19,11 @@ public class Constant {
     public static final Integer SESSION_TIMEOUT = 2000;
 
     public static final Integer CONNECT_TIMEOUT = 5000;
+
+    /**
+     * 分割字符
+     */
+    public static final String SPLIT = "&&";
+
+    public static final int MAX_FRAME_LENGTH = 1024;
 }
