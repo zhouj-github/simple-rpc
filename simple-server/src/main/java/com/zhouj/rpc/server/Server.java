@@ -2,9 +2,7 @@ package com.zhouj.rpc.server;
 
 import com.zhouj.rpc.config.RpcConfig;
 import com.zhouj.rpc.constant.Constant;
-import com.zhouj.rpc.protocol.Request;
-import com.zhouj.rpc.protocol.Decode;
-import com.zhouj.rpc.protocol.Encode;
+import com.zhouj.rpc.protocol.*;
 import com.zhouj.rpc.registry.ServerRegister;
 import com.zhouj.rpc.registry.ServiceRegistry;
 import com.zhouj.rpc.util.IpUtils;
@@ -68,8 +66,8 @@ public class Server {
             protected void initChannel(SocketChannel socketChannel) {
                 ByteBuf delimiter = Unpooled.buffer();
                 delimiter.writeBytes(Constant.SPLIT.getBytes());
-                socketChannel.pipeline().addLast(new Encode());
-                socketChannel.pipeline().addLast(new Decode(Constant.MAX_FRAME_LENGTH, delimiter, Request.class));
+                socketChannel.pipeline().addLast(new HeadLengthEncoder());
+                socketChannel.pipeline().addLast(new HeadLengthDecoder(Constant.MAX_FRAME_LENGTH, 0, 4, Request.class));
                 socketChannel.pipeline().addLast(new ServerHandler(serviceRegistry));
             }
         });

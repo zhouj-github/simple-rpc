@@ -5,7 +5,7 @@ Features:
 * 服务自动注册与发现
 * 服务节点优雅下线
 * 客户端负载均衡
-* 支持protobuf序列化
+* 支持protobuf协议
 * 请求超时重试
 * 基于javassist实现动态代理
 

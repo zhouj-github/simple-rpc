@@ -2,9 +2,7 @@ package com.zhouj.rpc.client;
 
 import com.zhouj.rpc.client.discover.ServiceDiscover;
 import com.zhouj.rpc.constant.Constant;
-import com.zhouj.rpc.protocol.Response;
-import com.zhouj.rpc.protocol.Decode;
-import com.zhouj.rpc.protocol.Encode;
+import com.zhouj.rpc.protocol.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -86,8 +84,8 @@ public class ConnectManager {
                         ByteBuf delimiter = Unpooled.buffer();
                         delimiter.writeBytes(Constant.SPLIT.getBytes());
                         ChannelPipeline channelPipeline = socketChannel.pipeline();
-                        channelPipeline.addLast(new Encode());
-                        channelPipeline.addLast(new Decode(Constant.MAX_FRAME_LENGTH, delimiter, Response.class));
+                        socketChannel.pipeline().addLast(new HeadLengthEncoder());
+                        socketChannel.pipeline().addLast(new HeadLengthDecoder(Constant.MAX_FRAME_LENGTH, 0, 4, Response.class));
                         channelPipeline.addLast(new ClientHandler());
                     }
                 });

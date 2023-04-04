@@ -6,11 +6,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-/**
+/**分隔符编码
+ *
  * @author zhouj
  * @since 2020-08-04
  */
-public class Encode extends MessageToByteEncoder {
+public class SplitEncode extends MessageToByteEncoder {
 
 
     @Override

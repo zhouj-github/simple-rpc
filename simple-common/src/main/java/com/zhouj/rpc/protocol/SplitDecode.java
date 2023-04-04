@@ -9,12 +9,14 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import java.util.List;
 
 /**
+ * 分割符解码
+ *
  * @author zhouj
  * @since 2020-08-04
  */
-public class Decode extends DelimiterBasedFrameDecoder {
+public class SplitDecode extends DelimiterBasedFrameDecoder {
 
-    public Decode(int maxFrameLength, ByteBuf delimiter, Class<?> generateClass) {
+    public SplitDecode(int maxFrameLength, ByteBuf delimiter, Class<?> generateClass) {
         super(maxFrameLength, delimiter);
         this.generateClass = generateClass;
     }
