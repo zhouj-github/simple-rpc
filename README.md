@@ -5,9 +5,10 @@ Features:
 * 服务自动注册与发现
 * 服务节点优雅下线
 * 客户端负载均衡
-* 支持protobuf协议
+* 支持protobuf序列化协议
 * 请求超时重试
 * 基于javassist实现动态代理
+* 支持同步,异步,回调三种调用方式
 
 ## 使用示例
 ### 引入依赖
@@ -49,10 +50,41 @@ public class ConsumerController {
     private RemoteService remoteService;
     
 
+    /**
+     * 同步调用
+     * @return 
+     */
     @RequestMapping("/remote")
     public String test() {
         return remoteService.remote();
     }
+    
+    /**
+     * 异步调用
+     * @return 
+     */
+    @RequestMapping("/async")
+    public String async() {
+        ResponseFuture responseFuture = AsyncClient.async(RemoteService.class, "remote", null);
+        Response response = responseFuture.get();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(response.getResult());
+        return stringBuilder.toString();
+    }
+
+    /**
+     * 回调
+     * @return 
+     */
+    @RequestMapping("/call")
+    public void call() {
+        AsyncClient.call(RemoteService.class, "remote", null, response -> {
+            logger.info("回调结果:{}", response.getResult());
+        });
+
+    }
+    
+    
 }
 ```
 ### 服务端示例

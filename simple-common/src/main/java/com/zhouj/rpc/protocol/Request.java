@@ -1,6 +1,8 @@
 package com.zhouj.rpc.protocol;
 
 
+import com.zhouj.rpc.call.Callable;
+
 /**
  * @author zhouj
  * @since 2020-08-03
@@ -81,4 +83,5 @@ public class Request {
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
+
 }

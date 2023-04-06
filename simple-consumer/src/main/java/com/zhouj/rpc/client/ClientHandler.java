@@ -1,5 +1,6 @@
 package com.zhouj.rpc.client;
 
+import com.zhouj.rpc.call.Callable;
 import com.zhouj.rpc.protocol.Request;
 import com.zhouj.rpc.protocol.Response;
 import io.netty.channel.Channel;
@@ -50,9 +51,13 @@ public class ClientHandler extends SimpleChannelInboundHandler<Response> {
         //响应结果写回rpcFuture
         String requestId = response.getRequestId();
         ResponseFuture rpcFuture = requestCache.get(requestId);
-        rpcFuture.setDone(true);
-        rpcFuture.setResponse(response);
-        LockSupport.unpark(rpcFuture.getThread());
+        if (rpcFuture.getCallable() != null) {
+            rpcFuture.getCallable().call(response);
+        } else {
+            rpcFuture.setDone(true);
+            rpcFuture.setResponse(response);
+            LockSupport.unpark(rpcFuture.getThread());
+        }
         log.info("耗时:{}ms", System.currentTimeMillis() - response.getTimestamp());
     }
 
@@ -63,6 +68,20 @@ public class ClientHandler extends SimpleChannelInboundHandler<Response> {
      */
     public ResponseFuture sendRequest(Request request) {
         ResponseFuture rpcFuture = new ResponseFuture(request);
+        rpcFuture.setThread(Thread.currentThread());
+        requestCache.put(request.getRequestId(), rpcFuture);
+        channel.writeAndFlush(request);
+        return rpcFuture;
+    }
+
+    /***
+     * 向服务端发送消息
+     * @param request
+     * @return
+     */
+    public ResponseFuture sendCall(Request request, Callable callable) {
+        ResponseFuture rpcFuture = new ResponseFuture(request);
+        rpcFuture.setCallable(callable);
         rpcFuture.setThread(Thread.currentThread());
         requestCache.put(request.getRequestId(), rpcFuture);
         channel.writeAndFlush(request);

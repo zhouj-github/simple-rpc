@@ -1,5 +1,6 @@
 package com.zhouj.rpc.client;
 
+import com.zhouj.rpc.call.Callable;
 import com.zhouj.rpc.constant.Constant;
 import com.zhouj.rpc.protocol.Request;
 import com.zhouj.rpc.protocol.Response;
@@ -23,6 +24,9 @@ public class ResponseFuture implements Future<Response> {
     private volatile Response response;
 
     private Thread thread;
+
+    private Callable callable;
+
 
     private volatile boolean done = false;
 
@@ -83,5 +87,15 @@ public class ResponseFuture implements Future<Response> {
         return response;
     }
 
+    public Request getRequest() {
+        return request;
+    }
 
+    public Callable getCallable() {
+        return callable;
+    }
+
+    public void setCallable(Callable callable) {
+        this.callable = callable;
+    }
 }
